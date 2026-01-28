@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEVIR — Persistent Reconnaissance</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="title">AEVIR</div>
+  <div class="subtitle">PERSISTENT RECONNAISSANCE ACROSS DIGITAL REALITY</div>
+</header>
+
+<nav>
+  <a href="#modules">MODULES</a>
+  <a href="#signals">SIGNALS</a>
+  <a href="#audit">AUDIT</a>
+</nav>
+
+<main>
+  <!-- System Status -->
+  <div class="status-bar">
+    <div>
+      <span style="color: #9a978f; font-size: 11px; margin-right: 12px;">SYSTEM STATE:</span>
+      <span class="status-pill idle" id="statusPill">IDLE</span>
+    </div>
+    <div style="font-size: 11px; color: #9a978f;">
+      <span id="signalCount">0</span> SIGNALS • <span id="echoCount">0</span> ECHOES
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions">
+    <button class="btn primary" id="scanBtn" onclick="initiateScan()">SCAN</button>
+    <button class="btn" id="correlateBtn" onclick="correlateSignals()" disabled>CORRELATE</button>
+    <button class="btn" onclick="exportData()">EXPORT</button>
+  </div>
+
+  <!-- Module Cards -->
+  <div class="grid" id="modules">
+    <div class="module-card" data-module="signals">
+      <div class="module-title">SIGNALS</div>
+      <div class="module-desc">Initial reconnaissance sweep. Identifies raw anomalies without correlation.</div>
+      <div class="module-status" id="signalsStatus">—</div>
+    </div>
+
+    <div class="module-card" data-module="echoes">
+      <div class="module-title">ECHOES</div>
+      <div class="module-desc">Correlates repeating signals across time to identify persistence or amplification.</div>
+      <div class="module-status" id="echoesStatus">—</div>
+    </div>
+
+    <div class="module-card" data-module="horizons">
+      <div class="module-title">HORIZONS</div>
+      <div class="module-desc">Projects correlated patterns outward. Probabilistic only.</div>
+      <div class="module-status" id="horizonsStatus">—</div>
+    </div>
+  </div>
+
+  <!-- Signal Feed -->
+  <div class="signal-feed" id="signals">
+    <div class="feed-title">SIGNAL FEED</div>
+    <div id="signalList">
+      <div style="color: #9a978f; font-size: 11px;">Awaiting scan initiation...</div>
+    </div>
+  </div>
+
+  <!-- Audit Timeline -->
+  <div class="timeline" id="audit">
+    <div class="feed-title">AUDIT TIMELINE</div>
+    <div id="timelineList">
+      <div class="timeline-item">
+        <span class="timeline-type">INIT</span>
+        <span class="signal-time">[<span id="bootTime">--:--:--</span>]</span>
+        System initialized.
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  AEVIR v1.0 • OPERATIONAL DIRECTIVE COMPLIANCE VERIFIED
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

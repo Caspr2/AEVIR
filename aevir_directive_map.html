@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEVIR Directive Map</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      background: #0b0b0c;
+      color: #eae6dc;
+      font-family: ui-monospace, Menlo, Monaco, "Courier New", monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    .title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+    
+    .subtitle {
+      font-size: 12px;
+      color: #9a978f;
+      letter-spacing: 0.5px;
+    }
+    
+    .map-container {
+      position: relative;
+      width: min(1200px, 100%);
+      height: 800px;
+    }
+    
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .layer-circle {
+      fill: none;
+      stroke: #232326;
+      stroke-width: 1;
+    }
+    
+    .connection-line {
+      stroke: #232326;
+      stroke-width: 1;
+      opacity: 0.3;
+    }
+    
+    .connection-line.active {
+      stroke: #00d9ff;
+      stroke-width: 1.5;
+      opacity: 0.6;
+    }
+    
+    .node-group {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .node-circle {
+      fill: #141416;
+      stroke: #232326;
+      stroke-width: 2;
+      transition: all 0.3s ease;
+    }
+    
+    .node-group:hover .node-circle,
+    .node-group.active .node-circle {
+      stroke: #00d9ff;
+      stroke-width: 2.5;
+    }
+    
+    .node-label {
+      fill: #eae6dc;
+      font-size: 11px;
+      text-anchor: middle;
+      pointer-events: none;
+      font-weight: 600;
+    }
+    
+    .core-circle {
+      fill: #0b0b0c;
+      stroke: #00d9ff;
+      stroke-width: 2;
+    }
+    
+    .core-label {
+      fill: #00d9ff;
+      font-size: 14px;
+      font-weight: 800;
+      text-anchor: middle;
+      letter-spacing: 1px;
+    }
+    
+    .layer-label {
+      fill: #9a978f;
+      font-size: 10px;
+      text-anchor: middle;
+      letter-spacing: 0.5px;
+    }
+    
+    .legend {
+      margin-top: 40px;
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: #9a978f;
+    }
+    
+    .legend-circle {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 2px solid;
+    }
+    
+    .legend-circle.layer1 { border-color: #00d9ff; }
+    .legend-circle.layer2 { border-color: #00a8cc; }
+    .legend-circle.layer3 { border-color: #007a99; }
+    .legend-circle.layer4 { border-color: #005566; }
+    
+    @media (max-width: 768px) {
+      .map-container {
+        height: 600px;
+      }
+      .node-label {
+        font-size: 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="title">AEVIR</div>
+    <div class="subtitle">OPERATIONAL DIRECTIVE MAP</div>
+  </div>
+  
+  <div class="map-container">
+    <svg viewBox="0 0 1200 800" id="directiveMap">
+      <!-- Layer circles (concentric) -->
+      <circle class="layer-circle" cx="600" cy="400" r="340" />
+      <circle class="layer-circle" cx="600" cy="400" r="260" />
+      <circle class="layer-circle" cx="600" cy="400" r="180" />
+      <circle class="layer-circle" cx="600" cy="400" r="100" />
+      
+      <!-- Core node -->
+      <g class="core-node">
+        <circle class="core-circle" cx="600" cy="400" r="60" />
+        <text class="core-label" x="600" y="395">AEVIR</text>
+        <text class="core-label" x="600" y="410" style="font-size: 10px; font-weight: 400;">CORE</text>
+      </g>
+      
+      <!-- Layer labels -->
+      <text class="layer-label" x="600" y="70">OPERATIONAL & LIFECYCLE</text>
+      <text class="layer-label" x="600" y="150">MEMORY & SECURITY</text>
+      <text class="layer-label" x="600" y="230">INTERACTION & LOGGING</text>
+      <text class="layer-label" x="600" y="310">VISUAL & SIGNAL CONTROL</text>
+    </svg>
+  </div>
+  
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-circle layer1"></div>
+      <span>Visual & Signal Control</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle layer2"></div>
+      <span>Interaction & Logging</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle layer3"></div>
+      <span>Memory & Security</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-circle layer4"></div>
+      <span>Operational & Lifecycle</span>
+    </div>
+  </div>
+
+  <script>
+    // Directive data structure
+    const directives = {
+      layer1: [
+        { name: "Branding\nIdentity", angle: 0 },
+        { name: "Pulse\nEvents", angle: 90 },
+        { name: "System\nStates", angle: 180 },
+        { name: "Output\nConfidence", angle: 270 }
+      ],
+      layer2: [
+        { name: "Analyst\nInteraction", angle: 30 },
+        { name: "Logging &\nVisibility", angle: 105 },
+        { name: "Error\nHandling", angle: 180 },
+        { name: "Module\nTaxonomy", angle: 255 }
+      ],
+      layer3: [
+        { name: "Data\nRetention", angle: 0 },
+        { name: "Security\nPosture", angle: 120 },
+        { name: "Deployment\nModes", angle: 240 }
+      ],
+      layer4: [
+        { name: "Auditability", angle: 45 },
+        { name: "Versioning\n& Change", angle: 135 },
+        { name: "Decommissioning", angle: 225 },
+        { name: "Governance\nFramework", angle: 315 }
+      ]
+    };
+    
+    const svg = document.getElementById('directiveMap');
+    const centerX = 600;
+    const centerY = 400;
+    const layers = [
+      { radius: 100, data: directives.layer1, color: '#00d9ff' },
+      { radius: 180, data: directives.layer2, color: '#00a8cc' },
+      { radius: 260, data: directives.layer3, color: '#007a99' },
+      { radius: 340, data: directives.layer4, color: '#005566' }
+    ];
+    
+    let activeNode = null;
+    const connections = [];
+    
+    // Create nodes for each layer
+    layers.forEach((layer, layerIndex) => {
+      layer.data.forEach((directive, index) => {
+        const angle = (directive.angle * Math.PI) / 180;
+        const x = centerX + layer.radius * Math.cos(angle);
+        const y = centerY + layer.radius * Math.sin(angle);
+        
+        // Create connection line to center
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('class', 'connection-line');
+        line.setAttribute('x1', centerX);
+        line.setAttribute('y1', centerY);
+        line.setAttribute('x2', x);
+        line.setAttribute('y2', y);
+        svg.appendChild(line);
+        
+        // Create node group
+        const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        group.setAttribute('class', 'node-group');
+        group.dataset.layer = layerIndex;
+        group.dataset.index = index;
+        
+        // Create node circle
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('class', 'node-circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', 25);
+        group.appendChild(circle);
+        
+        // Create node label (split by \n)
+        const lines = directive.name.split('\n');
+        lines.forEach((line, i) => {
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('class', 'node-label');
+          text.setAttribute('x', x);
+          text.setAttribute('y', y + (i - lines.length / 2 + 0.5) * 12);
+          text.textContent = line;
+          group.appendChild(text);
+        });
+        
+        // Store connection reference
+        connections.push({ group, line });
+        
+        // Add hover/click interactions
+        group.addEventListener('mouseenter', () => {
+          line.classList.add('active');
+          circle.style.stroke = layer.color;
+        });
+        
+        group.addEventListener('mouseleave', () => {
+          if (activeNode !== group) {
+            line.classList.remove('active');
+            circle.style.stroke = '';
+          }
+        });
+        
+        group.addEventListener('click', () => {
+          // Clear previous active
+          if (activeNode) {
+            activeNode.classList.remove('active');
+            const prevConnection = connections.find(c => c.group === activeNode);
+            if (prevConnection) {
+              prevConnection.line.classList.remove('active');
+            }
+          }
+          
+          // Set new active
+          if (activeNode === group) {
+            activeNode = null;
+          } else {
+            activeNode = group;
+            group.classList.add('active');
+            line.classList.add('active');
+          }
+        });
+        
+        svg.appendChild(group);
+      });
+    });
+  </script>
+</body>
+</html>
